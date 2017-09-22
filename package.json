@@ -1,0 +1,17 @@
+{
+  "name": "axel-bot",
+  "version": "0.0.0",
+  "description": "",
+  "main": "server.js",
+  "repository": "",
+  "author": "Keristero",
+  "dependencies": {
+    "async": "^0.2.10",
+    "discord.js": "^11.1.0",
+    "express": "~3.2.4",
+    "google-images": "^2.1.0",
+    "node-opus": "^0.2.6",
+    "socket.io": "~0.9.14",
+    "ytdl-core": "^0.14.4"
+  }
+}
