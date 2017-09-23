@@ -1,10 +1,10 @@
-var commands = require("../server.js").commands
 var functions = require("../functions.js").Functions;
 
 var command = {
     name: "help",
     help: "lists all commands",
     fn: function(msg, parameters) {
+        var commands = require("../server.js").commands
         var cmdHelps = []
         for (var cmdname in commands) {
             cmdHelps.push(cmdname + " : " + commands[cmdname].help);

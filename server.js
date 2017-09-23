@@ -62,9 +62,10 @@ try {
   }
 
 
-  exports = commands
 }
 catch (e) {
   console.log("error:");
   console.log(e);
 }
+
+exports.commands = commands
