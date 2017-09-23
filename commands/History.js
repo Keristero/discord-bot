@@ -6,7 +6,7 @@ var command = {
     help: "List everything that has played",
     fn: function(msg, parameters) {
         var PlayList = functions.getHistory();
-        msg.reply(PlayList.join('\n'))
+        functions.DMreply(msg,PlayList.join('\n'));
     }
 }
 

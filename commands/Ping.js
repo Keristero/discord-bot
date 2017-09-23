@@ -1,10 +1,11 @@
 var commands = require("../server.js")
+var functions = require("../functions.js").Functions;
 
 var command = {
     name: "ping",
     help: "Ping test",
     fn: function(msg, parameters) {
-        msg.reply('pong')
+        functions.DMreply(msg,"Pong");
     }
 }
 

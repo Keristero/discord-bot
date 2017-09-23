@@ -63,13 +63,10 @@ function finishDeathBattleImg(image1, image2, msg, callback) {
         deathBattleBackground.composite(deathBattleTemplate, 0, 0);
         deathBattleBackground.write("Final.png")
         setTimeout(function() {
-            sendImage("Final.png", msg)
-            //Send the image, wait for about 3 seconds before starting the actual battle
-            //Becuase it takes a while for the image to send
-            setTimeout(function() {
-                callback();
-            }, 3000)
-        }, 1000);
+            functions.sendFile(msg,"Final.png",null,function(){
+                callback()
+            })
+        }, 1500);
     })
 }
 
@@ -100,10 +97,11 @@ function createDeathBattleImg(imageurl1, imageurl2, msg, callback) {
 function replyImageSearchURL(searchTerm, msg) {
     imageSearch(searchTerm, (error, results) => {
         if (results[0]) {
-            msg.reply(results[0].url);
+            functions.botChannelReply(results[0].url)
+            functions.botChannelReply(results[0].url);
         }
         else {
-            msg.reply("https://www.highstakesdb.com/images/Players/20160224081413_705x365.jpg")
+            functions.botChannelReply("https://www.highstakesdb.com/images/Players/20160224081413_705x365.jpg")
         }
     });
 }
@@ -123,19 +121,11 @@ function searchImageUrl(searchTerm, callback) {
     });
 }
 
-function sendImage(imagePath, msg) {
-    msg.channel.send("FIGHT!", {
-        files: [
-            imagePath
-        ]
-    });
-}
-
 Deathbattle.startDeathBattle = function(msg, parameters) {
-    msg.reply("Preparing battle...")
-    var taunts = ["does a flip", "casts ultima", "does a cool pose", "is really feeling it", "taunts"]
-    var events = ["gropes", "roasts", "bullies", "intimidates", "casts fire on", "Dunks", "pokes", "strokes", "calls out", "insults", "dances for", "shoots", "licks", "whips", "strokes", "sniffs", "tags in", "slams", "backslash's", "down airs", "steals homework from", "ignites", "punches", "bites", "tickles", "Slices", "Pelts", "Clubs", "Bombards", "Carves", "Chops", "Spears", "Brands", "Hammers", "Clouts", "Flogs", "Bombs", "Blasts", "Torpedos", "Blows up", "Stabs", "Plunges", "Slices", "Buffets", "Thwacks", "Whips", "Burns", "Shoots", "Shocks", "Pierces", "Cuffs", "Lashes", "Belts", "Canes", "Straps", "Detonates", "Jabs", "Bats", "Penetrates", "Bumps", "Boots", "Punctures", "Pricks", "Zaps", "Sticks", "Stings", "Trounces", "Whales", "Pummel", "Batters", "Mauls", "Pounds", "Clobber", "Crushes", "Bashes", "Wallops", "Breaks", "Smashes", "Beats", "Whops", "Whacks", "Punches", "Jumps", "Clocks", "Stuns", "Busts", "Slugs", "Decks", "Boxes", "Kicks", "Bites", "Shoves", "Jolts", "Cuffs", "Crams", "Slams", "Slogs", "Bruises", "Mutilates", "Storms", "Punishes", "Hurts", "Wounds", "Injures", "Impacts", "Agitates", "Besieges"]
     var words = parameters.split(' vs ')
+    functions.botChannelReply(`Preparing battle between ${words[0]} and ${words[1]}`)
+    var lossTexts = ["explodes!", "goes home", "runs away", "feels depressed", "gives up", "surrenders", "passes out","cries","is removed from existence","ragequits","hard resets","whited out","was sent flying into orbit","turned out to be cheating so was eliminated","couldn't take it anymore","fell asleep","was decapitated","died","got down with the sickness","just fell over and died","vanished","got away safely","had a mental breakdown"]
+    var events = ["gropes", "roasts", "bullies", "intimidates", "casts fire on", "Dunks", "pokes", "strokes", "calls out", "insults", "dances for", "shoots", "licks", "whips", "strokes", "sniffs", "tags in", "slams", "backslash's", "down airs", "steals homework from", "ignites", "punches", "bites", "tickles", "Slices", "Pelts", "Clubs", "Bombards", "Carves", "Chops", "Spears", "Brands", "Hammers", "Clouts", "Flogs", "Bombs", "Blasts", "Torpedos", "Blows up", "Stabs", "Plunges", "Slices", "Buffets", "Thwacks", "Whips", "Burns", "Shoots", "Shocks", "Pierces", "Cuffs", "Lashes", "Belts", "Canes", "Straps", "Detonates", "Jabs", "Bats", "Penetrates", "Bumps", "Boots", "Punctures", "Pricks", "Zaps", "Sticks", "Stings", "Trounces", "Whales", "Pummel", "Batters", "Mauls", "Pounds", "Clobber", "Crushes", "Bashes", "Wallops", "Breaks", "Smashes", "Beats", "Whops", "Whacks", "Punches", "Jumps", "Clocks", "Stuns", "Busts", "Slugs", "Decks", "Boxes", "Kicks", "Bites", "Shoves", "Jolts", "Cuffs", "Crams", "Slams", "Slogs", "Bruises", "Mutilates", "Storms", "Punishes", "Hurts", "Wounds", "Injures", "Impacts", "Agitates", "Besieges"]
     var bonuses = ["it's super effective!!!", "noice", "but nothing happened..."]
     //SendImage
     var counter = 0;
@@ -161,16 +151,20 @@ Deathbattle.startDeathBattle = function(msg, parameters) {
                 if (RNG(1, 5) === 1) {
                     attackString += `, ${bonuses.random()}`
                 }
-                msg.reply(attackString);
+                functions.botChannelReply(attackString);
 
                 if (RNG(1, 5) !== 1) {
                     whoozeTurn = !whoozeTurn;
                     setTimeout(turn, 420 * RNG(6, 9));
                 }
                 else {
-                    var winMessage = `${words[Number(whoozeTurn)]} ${taunts.random()}`
-                    msg.reply(winMessage);
-                    replyImageSearchURL(`${words[Number(whoozeTurn)]}`, msg);
+                    var winMessage = `${words[Number(!whoozeTurn)]} ${lossTexts.random()}`
+                    functions.botChannelReply(winMessage);
+                    if(whoozeTurn){
+                        functions.sendFile(msg, url2, "The winner is "+words[1], ()=>{})
+                    }else{
+                        functions.sendFile(msg, url1, "The winner is "+words[0], ()=>{})
+                    }
                 }
             }
             turn();

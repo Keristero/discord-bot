@@ -28,6 +28,7 @@ try {
 
   bot.on('ready', () => {
     console.log('bot client connected');
+    functions.init(bot);
   });
 
   bot.on('message', msg => {
@@ -39,12 +40,19 @@ try {
         console.log(msg.author.username + " : " + command + " - " + parameters)
         commands[command].fn(msg, parameters);
       }
+      try{
+        if(msg.guild){
+          msg.delete()
+        }
+      }catch(e){
+        console.log("error deleting message");
+        console.log(e);
+      }
     }
   });
 
   //Initialize
   bot.login(Config.token);
-  functions.init(bot);
 
   //Check channels every minute
   setInterval(checkChannelsAtInterval, 60000)

@@ -1,4 +1,5 @@
 var commands = require("../server.js").commands
+var functions = require("../functions.js").Functions;
 
 var command = {
     name: "help",
@@ -8,7 +9,7 @@ var command = {
         for (var cmdname in commands) {
             cmdHelps.push(cmdname + " : " + commands[cmdname].help);
         }
-        msg.reply(cmdHelps.join('\n'))
+        functions.DMreply(msg,cmdHelps.join('\n'));
     }
 }
 

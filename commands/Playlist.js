@@ -17,7 +17,7 @@ var command = {
             }
             index++;
         });
-        msg.reply(arr.join('\n'))
+        functions.DMreply(msg,arr.join('\n'));
     }
 }
 

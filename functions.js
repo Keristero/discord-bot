@@ -6,6 +6,8 @@ var search = require('youtube-search');
 var ytdl = require('ytdl-core');
 const Config = require("./config.json");
 var titleHistory = [];
+var Guild;
+var BotChannel
 
 var voice_handler = null;
 var voice_connection = null;
@@ -14,86 +16,87 @@ var voice_channel = null;
 var autoplay = false;
 var loop = false;
 
+Functions.init = function(pbot) {
+    bot = pbot;
+    Guild = bot.guilds.find('id', Config.serverID)
+    BotChannel = Guild.channels.find('id', Config.textChannelID)
+}
 
-function Update(){
-    if(PlayList.length == 0 || !voice_connection || voice_handler){//If there is nothing to play, no voice connection, or something playing
+function Update() {
+    if (PlayList.length == 0 || !voice_connection || voice_handler) { //If there is nothing to play, no voice connection, or something playing
         return;
     }
-    
-    Functions.play(PlayList[0],function(){
-        if(PlayList.length == 1){
-            if(autoplay){
+
+    Functions.play(PlayList[0], function() {
+        if (PlayList.length == 1) {
+            if (autoplay) {
                 Functions.addRelatedVideo(PlayList[0].id)
             }
         }
-        if(!loop){
+        if (!loop) {
             titleHistory.push(PlayList[0].title)
-            PlayList.splice(0,1)
+            PlayList.splice(0, 1)
         }
     });
 }
-setInterval(Update,100);
+setInterval(Update, 100);
 
 var searchOpts = {
-  maxResults: 1,
-  key: Config.youtubeKey,
-  type: "video"
+    maxResults: 1,
+    key: Config.youtubeKey,
+    type: "video"
 };
 
-class Video{
-    constructor(title,url,id){
+class Video {
+    constructor(title, url, id) {
         this.title = title;
         this.url = url;
         this.id = id;
     }
 }
 
-Functions.createChannel = function(guild,name){
+Functions.createChannel = function(guild, name) {
     guild.createChannel(name, 'voice')
-    .then(channel => console.log(`Created new channel ${channel}`))
-    .catch(console.error);
+        .then(channel => console.log(`Created new channel ${channel}`))
+        .catch(console.error);
 }
 
-Functions.getVoiceChannelNames = function(guild){
-    var voiceChannels = guild.channels.filter((channel)=>{
+Functions.getVoiceChannelNames = function(guild) {
+    var voiceChannels = guild.channels.filter((channel) => {
         return channel.type == "voice";
     })
     var vcNames = voiceChannels.reduce(function(a, c) {
-      return a.concat(c.name);
+        return a.concat(c.name);
     }, []);
     return vcNames
 }
 
-Functions.init = function(pbot){
-    bot = pbot;
-}
-
-Functions.play = function(video,callback){
+Functions.play = function(video, callback) {
     bot.user.setGame(video.title);
     var audio_stream = ytdl(video.url);
-	voice_handler = voice_connection.playStream(audio_stream);
+    voice_handler = voice_connection.playStream(audio_stream);
 
-	voice_handler.once("end", reason => {
-		voice_handler = null;
-		bot.user.setGame();
-		callback();
-	});
+    voice_handler.once("end", reason => {
+        voice_handler = null;
+        bot.user.setGame();
+        callback();
+    });
 }
 
-Functions.toggleAutoplay = function(message){
+Functions.toggleAutoplay = function(message) {
     autoplay = !autoplay;
-    message.reply("Autoplay = "+autoplay);
+    Functions.DMreply(message, "Autoplay = " + autoplay);
 }
 
-Functions.toggleLoop = function(message){
+Functions.toggleLoop = function(message) {
     loop = !loop;
-    message.reply("Loop = "+loop);
+    Functions.DMreply(message, "Loop = " + loop);
 }
 
-Functions.setVolume = function(newVolumeString){
+Functions.setVolume = function(newVolumeString) {
     var newVolume = parseFloat(newVolumeString);
-    if(newVolume > 0.1 && newVolume <= 2.0){
-	    voice_handler.setVolume(newVolume);
+    if (newVolume > 0.1 && newVolume <= 2.0) {
+        voice_handler.setVolume(newVolume);
     };
 }
 
@@ -106,65 +109,100 @@ Functions.searchAndAddVideo = function(parameters) {
 
 Functions.addRelatedVideo = function(videoID) {
     var newOpts = JSON.parse(JSON.stringify(searchOpts));
-    newOpts["relatedToVideoId"]=videoID;
-    newOpts["maxResults"]=20;
+    newOpts["relatedToVideoId"] = videoID;
+    newOpts["maxResults"] = 20;
     search("", newOpts, (err, results) => {
         if (err) return console.log(err);
-        for(var i = 0; i < results.length; i++){
+        for (var i = 0; i < results.length; i++) {
             var playedAlready = false;
-            titleHistory.forEach((title)=>{
-                if(results[0].title === title){
+            titleHistory.forEach((title) => {
+                if (results[0].title === title) {
                     playedAlready = true;
                 }
             })
-            if(!playedAlready){
+            if (!playedAlready) {
                 Functions.addToPlayList(results[0]);
                 return;
-            }else{
-                
+            }
+            else {
+
             }
         }
     });
 }
 
-Functions.addToPlayList = function(searchResult){
+Functions.addToPlayList = function(searchResult) {
     console.log(searchResult);
-    var video = new Video(searchResult.title,searchResult.link,searchResult.id);
+    var video = new Video(searchResult.title, searchResult.link, searchResult.id);
     PlayList.push(video);
 }
 
-Functions.skip = function(){
+Functions.skip = function() {
     loop = false
     voice_handler.end();
 }
 
-Functions.joinVoice = function(msg){
-    if(msg.member){
-            var VCtoJoin = msg.member.voiceChannel;
-            if(VCtoJoin){//If sender is in a voice channel
-            if(voice_connection){//If bot is already in voice channel
-                if(voice_channel.id !== VCtoJoin.id){//If the sender is not in the same voice channel
+Functions.joinVoice = function(msg) {
+    if (msg.member) {
+        var VCtoJoin = msg.member.voiceChannel;
+        if (VCtoJoin) { //If sender is in a voice channel
+            if (voice_connection) { //If bot is already in voice channel
+                if (voice_channel.id !== VCtoJoin.id) { //If the sender is not in the same voice channel
                     voice_connection.channel.leave();
-                }else{
-                    return false;
                 }
             }
+            // join vc
             VCtoJoin.join().then((vc) => {
                 voice_connection = vc;
                 voice_channel = vc.channel;
-                return true;
             })
         }
     }
-    return false;
 }
 
-Functions.getPlaylist = function(){
+Functions.getPlaylist = function() {
     return PlayList;
 }
 
-Functions.getHistory = function(){
+Functions.getHistory = function() {
     return titleHistory;
 }
+
+Functions.DMreply = function(message, text) {
+    if (!text) {
+        text = "no response";
+    }
+    var channel = message.author.dmChannel;
+    if (channel) {
+        channel.send(text, {})
+            .then(message => console.log(`Sent message: ${message.content}`))
+            .catch(console.error);
+    }
+    else {
+        message.author.createDM().then(() => { Functions.DMreply(message, text) });
+    }
+}
+
+Functions.botChannelReply = function(text) {
+    if (!text) {
+        text = "no response";
+    }
+    if (Guild.available) {
+        BotChannel.send(text, {})
+            .then(message => console.log(`Sent message: ${message.content}`))
+            .catch(console.error);
+    }
+}
+
+Functions.sendFile = function(msg, path, ptext, callback) {
+    var text = ptext || " ";
+    BotChannel.send(text, {
+        files: [
+            path
+        ]
+    }).then(()=>{
+        callback()
+    })
+};
 
 exports.Functions = Functions;
