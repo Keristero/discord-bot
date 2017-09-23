@@ -31,9 +31,6 @@ class guildManager {
                     }
                 }
             }
-
-            console.log("user games =" + this.userGames.join(' '));
-            console.log("existingChannels =" + this.existingChannels.join(' '));
         }
     }
 }

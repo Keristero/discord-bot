@@ -1,16 +1,33 @@
 try {
   //Packages
+  const fs = require('fs');
+  const path = require('path');
   const Discord = require('discord.js');
   const bot = new Discord.Client();
 
+  var commands = requireCommands()
+
   //Scripts
   const Config = require("./config.json");
-  const commands = require("./commands.js").Commands;
+  //const commands = require("./commands.js").Commands;
   const functions = require("./functions.js").Functions;
   const vcManager = require("./vcManager.js").Manager;
 
+  function requireCommands() {
+    var arrCommands = {};
+    var commandPath = "./commands/";
+    fs.readdirSync(commandPath).forEach((file) => {
+      if (path.extname(file) === '.js') {
+        var command = require(commandPath + file).command;
+        arrCommands[command.name] = [command][0];
+        console.log("Loaded command " + command.name)
+      }
+    });
+    return arrCommands;
+  }
+
   bot.on('ready', () => {
-    console.log('unexpected rhys Line 420 char at 69 "]"');
+    console.log('bot client connected');
   });
 
   bot.on('message', msg => {
@@ -28,7 +45,6 @@ try {
   //Initialize
   bot.login(Config.token);
   functions.init(bot);
-  commands.init(bot, functions, vcManager);
 
   //Check channels every minute
   setInterval(checkChannelsAtInterval, 60000)
@@ -36,7 +52,11 @@ try {
   function checkChannelsAtInterval() {
     vcManager.manageGuildChannels(bot)
   }
+
+
+  exports = commands
 }
 catch (e) {
+  console.log("error:");
   console.log(e);
 }

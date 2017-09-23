@@ -1,11 +1,21 @@
+var commands = require("../server.js");
+var functions = require("../functions.js").Functions;
 const Discord = require('discord.js');
 const imageSearch = require('g-i-s');
 const async = require('async');
 const Jimp = require("jimp");
 const fs = require('fs');
 const request = require('request');
-
 var Deathbattle = {};
+
+var command = {
+    name: "deathbattle",
+    help: "use vs to seperate the two fighters. case sensitive.",
+    fn: function(msg, parameters) {
+        Deathbattle.startDeathBattle(msg, parameters);
+    }
+}
+exports.command = command;
 
 function RNG(min, max) {
     return min + (Math.floor(Math.random() * ((max + 1) - min)));
@@ -100,8 +110,12 @@ function replyImageSearchURL(searchTerm, msg) {
 
 function searchImageUrl(searchTerm, callback) {
     imageSearch(searchTerm, (error, results) => {
-        if (results[0]) {
-            callback(error, results[0].url)
+        var testIndex = 0;
+        while(results[testIndex] && results[testIndex].url.endsWith(".svg")){
+            testIndex++;
+        }
+        if (results[testIndex]) {
+            callback(error, results[testIndex].url)
         }
         else {
             callback(error, "https://www.highstakesdb.com/images/Players/20160224081413_705x365.jpg")
@@ -119,8 +133,8 @@ function sendImage(imagePath, msg) {
 
 Deathbattle.startDeathBattle = function(msg, parameters) {
     msg.reply("Preparing battle...")
-    var taunts = ["Defined", "Undefined", "does a flip", "casts ultima", "does a cool pose", "really feels it", "taunts", "Loses"]
-    var events = ["gropes", "roasts", "bullies", "intimidates", "casts fire on", "Dunks", "pokes", "strokes", "calls out", "insults", "dances for", "really feels", "shoots", "licks", "whips", "strokes", "sniffs", "tags in", "slams", "backslash's", "down airs", "steals homework from", "ignites", "punches", "bites", "tickles", "Slices", "Pelts", "Clubs", "Bombards", "Carves", "Chops", "Spears", "Brands", "Hammers", "Clouts", "Flogs", "Bombs", "Blasts", "Torpedos", "Blows up", "Stabs", "Plunges", "Slices", "Buffets", "Thwacks", "Whips", "Burns", "Shoots", "Shocks", "Pierces", "Cuffs", "Lashes", "Belts", "Canes", "Straps", "Detonates", "Jabs", "Bats", "Penetrates", "Bumps", "Boots", "Punctures", "Pricks", "Zaps", "Sticks", "Stings", "Trounces", "Whales", "Pummel", "Batters", "Mauls", "Pounds", "Clobber", "Crush", "Bash", "Wallops", "Breaks", "Smashes", "Beats", "Whops", "Whacks", "Punches", "Jumps", "Clocks", "Stuns", "Busts", "Slugs", "Decks", "Boxes", "Kicks", "Bites", "Shoves", "Jolts", "Cuffs", "Crams", "Slams", "Slogs", "Bruises", "Mutilates", "Storms", "Punishes", "Hurts", "Wounds", "Injures", "Impacts", "Agitates", "Besieges"]
+    var taunts = ["does a flip", "casts ultima", "does a cool pose", "is really feeling it", "taunts"]
+    var events = ["gropes", "roasts", "bullies", "intimidates", "casts fire on", "Dunks", "pokes", "strokes", "calls out", "insults", "dances for", "shoots", "licks", "whips", "strokes", "sniffs", "tags in", "slams", "backslash's", "down airs", "steals homework from", "ignites", "punches", "bites", "tickles", "Slices", "Pelts", "Clubs", "Bombards", "Carves", "Chops", "Spears", "Brands", "Hammers", "Clouts", "Flogs", "Bombs", "Blasts", "Torpedos", "Blows up", "Stabs", "Plunges", "Slices", "Buffets", "Thwacks", "Whips", "Burns", "Shoots", "Shocks", "Pierces", "Cuffs", "Lashes", "Belts", "Canes", "Straps", "Detonates", "Jabs", "Bats", "Penetrates", "Bumps", "Boots", "Punctures", "Pricks", "Zaps", "Sticks", "Stings", "Trounces", "Whales", "Pummel", "Batters", "Mauls", "Pounds", "Clobber", "Crushes", "Bashes", "Wallops", "Breaks", "Smashes", "Beats", "Whops", "Whacks", "Punches", "Jumps", "Clocks", "Stuns", "Busts", "Slugs", "Decks", "Boxes", "Kicks", "Bites", "Shoves", "Jolts", "Cuffs", "Crams", "Slams", "Slogs", "Bruises", "Mutilates", "Storms", "Punishes", "Hurts", "Wounds", "Injures", "Impacts", "Agitates", "Besieges"]
     var words = parameters.split(' vs ')
     var bonuses = ["it's super effective!!!", "noice", "but nothing happened..."]
     //SendImage
@@ -163,5 +177,3 @@ Deathbattle.startDeathBattle = function(msg, parameters) {
         });
     })
 }
-
-exports.Deathbattle = Deathbattle;
