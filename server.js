@@ -21,6 +21,13 @@ try {
         var command = require(commandPath + file).command;
         arrCommands[command.name] = [command][0];
         console.log("Loaded command " + command.name)
+        //Load aliases for each command if it has any
+        if (command.aliases) {
+          command.aliases.forEach((alias) => {
+            arrCommands[alias] = [command][0];
+            console.log(`Loaded alias for ${command.name} : ${alias}`)
+          })
+        }
       }
     });
     return arrCommands;
@@ -40,11 +47,12 @@ try {
         console.log(msg.author.username + " : " + command + " - " + parameters)
         commands[command].fn(msg, parameters);
       }
-      try{
-        if(msg.guild){
+      try {
+        if (msg.guild) {
           msg.delete()
         }
-      }catch(e){
+      }
+      catch (e) {
         console.log("error deleting message");
         console.log(e);
       }

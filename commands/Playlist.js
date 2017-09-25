@@ -3,6 +3,7 @@ var functions = require("../functions.js").Functions;
 
 var command = {
     name: "playlist",
+    aliases: ["list"],
     help: "List everything in the playlist",
     fn: function(msg, parameters) {
         var PlayList = functions.getPlaylist();
