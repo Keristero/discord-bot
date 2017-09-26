@@ -130,9 +130,8 @@ Functions.addRelatedVideo = function(videoID) {
             if (!playedAlready) {
                 Functions.addToPlayList(results[0]);
                 return;
-            }
-            else {
-
+            }else {
+                console.log("No unplayed related videos found")
             }
         }
     });
