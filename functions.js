@@ -22,6 +22,12 @@ Functions.init = function(pbot) {
     BotChannel = Guild.channels.find('id', Config.textChannelID)
 }
 
+Functions.playbackTime = function(){
+    if(voice_handler){
+        return Math.floor(voice_handler.time/1000)
+    }
+}
+
 function Update() {
     if (PlayList.length == 0 || !voice_connection || voice_handler) { //If there is nothing to play, no voice connection, or something playing
         return;
@@ -48,10 +54,11 @@ var searchOpts = {
 };
 
 class Video {
-    constructor(title, url, id) {
+    constructor(title, url, id, length) {
         this.title = title;
         this.url = url;
         this.id = id;
+        this.length = length
     }
 }
 
@@ -132,9 +139,15 @@ Functions.addRelatedVideo = function(videoID) {
 }
 
 Functions.addToPlayList = function(searchResult) {
-    console.log(searchResult);
-    var video = new Video(searchResult.title, searchResult.link, searchResult.id);
+    //Add new video object to playlist
+    let video = new Video(searchResult.title, searchResult.link, searchResult.id, 0);
     PlayList.push(video);
+    console.log("added video to playlist");
+    //Get info for the video
+    ytdl.getInfo(searchResult.link,[],(err,info)=>{
+        video.length = Number(info.length_seconds);
+        console.log("updated video length to "+info.length_seconds);
+    });
 }
 
 Functions.skip = function() {

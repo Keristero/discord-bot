@@ -7,13 +7,16 @@
   "author": "Keristero",
   "dependencies": {
     "async": "^0.2.10",
+    "bufferutil": "^3.0.2",
     "discord.js": "^11.1.0",
+    "erlpack": "github:hammerandchisel/erlpack",
     "express": "~3.2.4",
     "g-i-s": "^2.0.0",
     "google-images": "^2.1.0",
     "jimp": "^0.2.28",
     "node-opus": "^0.2.6",
     "socket.io": "~0.9.14",
+    "uws": "^8.14.1",
     "youtube-search": "^1.0.10",
     "ytdl-core": "^0.14.4"
   }

@@ -9,10 +9,10 @@ class guildManager {
         this.existingChannels = [];
         this.userGames = [];
     }
-    update() {
+    update(bot) {
         restartUpdate: {
             this.existingChannels = Manager.getVoiceChannelNames(this.guild);
-            this.userGames = Manager.getMemberGameNames(this.guild);
+            this.userGames = Manager.getMemberGameNames(this.guild,bot);
             //Add exclusions, dont delete General
             this.userGames.push("General");
             this.userGames.push("General 2");
@@ -44,7 +44,7 @@ Manager.manageGuildChannels = function(bot) {
     })
     //Update managedGuilds
     for (var guildname in managedGuilds) {
-        managedGuilds[guildname].update();
+        managedGuilds[guildname].update(bot);
     }
 }
 
@@ -82,10 +82,10 @@ Manager.getVoiceChannelNames = function(guild) {
     return vcNames
 }
 
-Manager.getMemberGameNames = function(guild) {
+Manager.getMemberGameNames = function(guild,bot) {
     var guildMemberGames = [];
     guild.members.forEach((member) => {
-        if (member.presence.game) {
+        if (member.presence.game && member.id !== bot.id) {
             guildMemberGames.push(TEMP_CHANNEL_PREFIX + "" + member.presence.game.name);
         }
     });
