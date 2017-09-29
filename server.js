@@ -43,7 +43,7 @@ function instantiateManagers() {
     if (path.extname(file) === '.js') {
       var manager = require(managerPath + file).manager;
       arrManagers[manager.name] = manager;
-      console.log("Loaded " +manager.name+" Manager")
+      console.log("Loaded " + manager.name + " Manager")
       //Load aliases for each command if it has any
     }
   });
@@ -55,12 +55,13 @@ bot.on('ready', () => {
   exports.bot = bot;
   guild = bot.guilds.find('id', Config.serverID)
   exports.guild = guild;
-  console.log("guild",guild.id)
+  console.log("guild", guild.id)
   botChannel = guild.channels.find('id', Config.textChannelID)
   exports.guild = guild;
-  console.log("botChannel",botChannel.id)
+  console.log("botChannel", botChannel.id)
   functions.init(bot);
   managers = instantiateManagers()
+  exports.managers = managers;
   console.log('loading complete');
 });
 
@@ -89,5 +90,3 @@ bot.on('message', msg => {
 bot.login(Config.token);
 
 exports.commands = commands
-exports.bot = bot;
-exports.guild = guild;
