@@ -6,7 +6,6 @@
   "repository": "",
   "author": "Keristero",
   "dependencies": {
-    "aliexpress": "^0.2.2",
     "async": "^0.2.10",
     "bufferutil": "^3.0.2",
     "discord.js": "^11.2.1",
