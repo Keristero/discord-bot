@@ -8,6 +8,7 @@ const Config = require("./config.json");
 var titleHistory = [];
 var Guild;
 var BotChannel
+var AttChannel;
 
 var voice_handler = null;
 var voice_connection = null;
@@ -20,6 +21,7 @@ Functions.init = function(pbot) {
     bot = pbot;
     Guild = bot.guilds.find('id', Config.serverID)
     BotChannel = Guild.channels.find('id', Config.textChannelID)
+    AttChannel = Guild.channels.find('id', Config.attingChannelID)
 }
 
 Functions.playbackTime = function(){
@@ -201,6 +203,17 @@ Functions.botChannelReply = function(text) {
     }
     if (Guild.available) {
         BotChannel.send(text, {})
+            .then(message => console.log(`Sent message: ${message.content}`))
+            .catch(console.error);
+    }
+}
+
+Functions.attChannelReply = function(text) {
+    if (!text) {
+        text = "no response";
+    }
+    if (Guild.available) {
+        AttChannel.send(text, {})
             .then(message => console.log(`Sent message: ${message.content}`))
             .catch(console.error);
     }

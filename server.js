@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const Discord = require('discord.js');
+
 //Exported references
 const bot = new Discord.Client();
 var guild = null;
@@ -14,7 +15,6 @@ var managers = null;
 const Config = require("./config.json");
 //const commands = require("./commands.js").Commands;
 const functions = require("./functions.js").Functions;
-const vcManager = require("./vcManager.js").Manager;
 
 function requireCommands() {
   var arrCommands = {};
@@ -65,25 +65,49 @@ bot.on('ready', () => {
   console.log('loading complete');
 });
 
-bot.on('message', msg => {
-  if (msg.content[0] === Config.prefix) { // Check to see if the prefix was used
-    var parts = msg.content.split(' ') // Split the message at each space
-    var command = parts[0].substr(1).toLowerCase() // Get the first word and set it to lower case
-    var parameters = parts.slice(1, parts.length).join(' ') // Get the remaining words
-    if (commands[command]) {
-      console.log(msg.author.username + " : " + command + " - " + parameters)
-      commands[command].fn(msg, parameters);
-    }
-    try {
-      if (msg.guild) {
-        msg.delete()
-      }
-    }
-    catch (e) {
-      console.log("error deleting message");
-      console.log(e);
+function deleteMessage(msg) {
+  try {
+    if (msg.guild) {
+      msg.delete()
     }
   }
+  catch (e) {
+    console.log("error deleting message");
+    console.log(e);
+  }
+}
+
+bot.on('message', msg => {
+  if (msg.author.id !== bot.user.id) {
+    if (msg.content[0] === Config.prefix) { // Check to see if the prefix was used
+      var parts = msg.content.split(' ') // Split the message at each space
+      var command = parts[0].substr(1).toLowerCase() // Get the first word and set it to lower case
+      var parameters = parts.slice(1, parts.length).join(' ') // Get the remaining words
+      if (commands[command]) {
+        console.log(msg.author.username + " : " + command + " - " + parameters)
+        commands[command].fn(msg, parameters);
+      }
+      deleteMessage(msg);
+    }
+    else {
+      var attUsersArray = msg.mentions.users.array();
+      if (attUsersArray.length > 0 || msg.mentions.everyone) {
+        var replyString = msg.author.username + " @ed :";
+        /*
+        attUsersArray.forEach((user) => {
+          replyString += user + " "
+        })
+        if (msg.mentions.everyone) {
+          replyString += "everyone "
+        }
+        */
+        replyString += msg.content;
+        functions.attChannelReply(replyString)
+        deleteMessage(msg);
+      }
+    }
+  }
+
 });
 
 //Initialize

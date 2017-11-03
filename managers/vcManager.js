@@ -8,7 +8,7 @@ class guildManager {
     constructor() {
         this.name = "VoiceChannel"
         this.guild = server.guild
-        setInterval(this.update, 60000)
+        setInterval(this.update, 10000)
     }
     update() {
         this.existingChannels = instance.getVoiceChannelNames();
@@ -32,16 +32,20 @@ class guildManager {
         }
     }
     createChannel(name) {
+        function onCreation(channel){
+            console.log(`(VC Manager) Created new channel ${channel.name}`);
+            //channel.setParent(server.guild.channels.get(Config.voiceChannelCategoryID));
+        }
         server.guild.createChannel(name, 'voice')
-            .then(channel => console.log(`Created new channel ${channel}`))
+            .then(onCreation)
             .catch(console.error);
     }
     deleteChannelByName(name) {
-        console.log('trying to delete ' + name)
+        console.log('(VC Manager) trying to delete ' + name)
         var matchingNameVc = server.guild.channels.find("name", name);
         if (matchingNameVc) {
             matchingNameVc.delete()
-                .then(console.log("deleted a unused channel")) // Success
+                .then(console.log("(VC Manager) deleted " + name)) // Success
                 .catch(console.error); // Log error
         }
     }
